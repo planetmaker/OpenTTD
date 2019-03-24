@@ -334,6 +334,7 @@ enum SavegameType {
 };
 
 extern FileToSaveLoad _file_to_saveload;
+extern char _titlegame_to_load[MAX_PATH];
 
 void GenerateDefaultSaveName(char *buf, const char *last);
 void SetSaveLoadError(StringID str);

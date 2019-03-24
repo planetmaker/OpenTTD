@@ -163,6 +163,7 @@ static void ShowHelp()
 		"  -d [[fac=]lvl[,...]]= Debug mode\n"
 		"  -e                  = Start Editor\n"
 		"  -g [savegame]       = Start new/save game immediately\n"
+		"  -T savegame         = Use savegame as title game\n"
 		"  -G seed             = Set random seed\n"
 		"  -n [ip:port#company]= Join network game\n"
 		"  -p password         = Password to join server\n"
@@ -327,7 +328,7 @@ static void LoadIntroGame(bool load_newgrfs = true)
 	SetupColoursAndInitialWindow();
 
 	/* Load the default opening screen savegame */
-	if (SaveOrLoad("opntitle.dat", SLO_LOAD, DFT_GAME_FILE, BASESET_DIR) != SL_OK) {
+	if (SaveOrLoad(_titlegame_to_load, SLO_LOAD, DFT_GAME_FILE, BASESET_DIR) != SL_OK) {
 		GenerateWorld(GWM_EMPTY, 64, 64); // if failed loading, make empty world.
 		WaitTillGeneratedWorld();
 		SetLocalCompany(COMPANY_SPECTATOR);
@@ -511,6 +512,7 @@ static const OptionData _options[] = {
 #endif
 	 GETOPT_SHORT_VALUE('r'),
 	 GETOPT_SHORT_VALUE('t'),
+	 GETOPT_SHORT_VALUE('T'),
 	GETOPT_SHORT_OPTVAL('d'),
 	 GETOPT_SHORT_NOVAL('e'),
 	GETOPT_SHORT_OPTVAL('g'),
@@ -550,6 +552,7 @@ int openttd_main(int argc, char *argv[])
 	_game_mode = GM_MENU;
 	_switch_mode = SM_MENU;
 	_config_file = NULL;
+	strecpy(_titlegame_to_load, "opntitle.dat", lastof(_titlegame_to_load));
 
 	GetOptData mgo(argc - 1, argv + 1, _options);
 	int ret = 0;
@@ -608,6 +611,12 @@ int openttd_main(int argc, char *argv[])
 				break;
 			}
 		case 'e': _switch_mode = (_switch_mode == SM_LOAD_GAME || _switch_mode == SM_LOAD_SCENARIO ? SM_LOAD_SCENARIO : SM_EDITOR); break;
+//		case 'T': _titlegame_to_load.SetName(mgo.opt); break;
+		case 'T':
+			if (mgo.opt != NULL) {
+				strecpy(_titlegame_to_load, mgo.opt, lastof(_titlegame_to_load));
+			}
+			break;
 		case 'g':
 			if (mgo.opt != NULL) {
 				_file_to_saveload.SetName(mgo.opt);
