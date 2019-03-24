@@ -60,6 +60,7 @@ static bool _do_scan_working_directory = true;
 
 extern char *_config_file;
 extern char *_highscore_file;
+extern char *_titlegame_file;
 
 /**
  * Get position in the current file.
@@ -1207,6 +1208,8 @@ void DeterminePaths(const char *exe)
 	_hotkeys_file = str_fmt("%shotkeys.cfg", config_dir);
 	extern char *_windows_file;
 	_windows_file = str_fmt("%swindows.cfg", config_dir);
+	extern char *_titlegame_file;
+	if (_titlegame_file == NULL) _titlegame_file = str_fmt("%sopntitle.dat", "");
 
 #if defined(WITH_XDG_BASEDIR) && defined(WITH_PERSONAL_DIR)
 	if (config_dir == config_home) {

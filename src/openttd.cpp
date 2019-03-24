@@ -82,6 +82,7 @@ bool HandleBootstrap();
 extern Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY);
 extern void ShowOSErrorBox(const char *buf, bool system);
 extern char *_config_file;
+char *_titlegame_file;
 
 /**
  * Error handling for fatal user errors.
@@ -328,7 +329,7 @@ static void LoadIntroGame(bool load_newgrfs = true)
 	SetupColoursAndInitialWindow();
 
 	/* Load the default opening screen savegame */
-	if (SaveOrLoad(_titlegame_to_load, SLO_LOAD, DFT_GAME_FILE, BASESET_DIR) != SL_OK) {
+	if (SaveOrLoad(_titlegame_file, SLO_LOAD, DFT_GAME_FILE, BASESET_DIR) != SL_OK) {
 		GenerateWorld(GWM_EMPTY, 64, 64); // if failed loading, make empty world.
 		WaitTillGeneratedWorld();
 		SetLocalCompany(COMPANY_SPECTATOR);
@@ -552,7 +553,7 @@ int openttd_main(int argc, char *argv[])
 	_game_mode = GM_MENU;
 	_switch_mode = SM_MENU;
 	_config_file = NULL;
-	strecpy(_titlegame_to_load, "opntitle.dat", lastof(_titlegame_to_load));
+	_titlegame_file = NULL;
 
 	GetOptData mgo(argc - 1, argv + 1, _options);
 	int ret = 0;
@@ -611,12 +612,7 @@ int openttd_main(int argc, char *argv[])
 				break;
 			}
 		case 'e': _switch_mode = (_switch_mode == SM_LOAD_GAME || _switch_mode == SM_LOAD_SCENARIO ? SM_LOAD_SCENARIO : SM_EDITOR); break;
-//		case 'T': _titlegame_to_load.SetName(mgo.opt); break;
-		case 'T':
-			if (mgo.opt != NULL) {
-				strecpy(_titlegame_to_load, mgo.opt, lastof(_titlegame_to_load));
-			}
-			break;
+		case 'T': free(_titlegame_file); _titlegame_file = stredup(mgo.opt); break;
 		case 'g':
 			if (mgo.opt != NULL) {
 				_file_to_saveload.SetName(mgo.opt);

@@ -20,6 +20,10 @@
 #include "../thread/thread.h"
 #include "../progress.h"
 #include "../core/random_func.hpp"
+#include "../fios.h"
+#include "../screenshot.h"
+#include "../base_media_base.h"
+#include "../saveload/saveload.h"
 #include "../core/math_func.hpp"
 #include "../fileio_func.h"
 #include "../framerate_type.h"
@@ -660,6 +664,7 @@ void VideoDriver_SDL::MainLoop()
 	uint32 cur_ticks = SDL_GetTicks();
 	uint32 last_cur_ticks = cur_ticks;
 	uint32 next_tick = cur_ticks + MILLISECONDS_PER_TICK;
+	uint32 first_tick = next_tick;
 	uint32 mod;
 	int numkeys;
 	Uint8 *keys;
@@ -757,7 +762,14 @@ void VideoDriver_SDL::MainLoop()
 			if (_draw_mutex != NULL) _draw_mutex->BeginCritical();
 
 			UpdateWindows();
-			_local_palette = _cur_palette;
+			if (first_tick < cur_ticks - MILLISECONDS_PER_TICK) {
+				char path[MAX_PATH];
+				strecpy(path, _titlegame_file, lastof(path));
+				char *p = strstr(path, ".sav");
+				seprintf(p, lastof(path), "-%s-%04ix%04i", BaseGraphics::GetUsedSet()->name, _screen.width, _screen.height);
+				MakeScreenshot(SC_VIEWPORT, path);
+				_exit_game = 1;
+			}
 		} else {
 			/* Release the thread while sleeping */
 			if (_draw_mutex != NULL) _draw_mutex->EndCritical();

@@ -780,6 +780,7 @@ void DoScanNewGRFFiles(void *callback)
  */
 void ScanNewGRFFiles(NewGRFScanCallback *callback)
 {
+	return;
 	/* First set the modal progress. This ensures that it will eventually let go of the paint mutex. */
 	SetModalProgress(true);
 	/* Only then can we really start, especially by marking the whole screen dirty. Get those other windows hidden!. */
